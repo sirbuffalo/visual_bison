@@ -1,5 +1,15 @@
 from re import search
 import unicodedata
+from json import load
+
+
+operators_unprocessed = load(open('operators.json', 'r'))
+operators = {
+    operator['operator']: operation['name']
+    for operation in operators_unprocessed
+    if operation['operator_type'] == 'normal'
+    for operator in operation['operators']
+}
 
 
 def detect_data(unstripped_text):
@@ -11,40 +21,24 @@ def detect_data(unstripped_text):
         }
     except ValueError:
         pass
-    # try:
-    #     return {
-    #         'type': 'number',
-    #         'value': unicodedata.numeric(text.strip())
-    #     }
-    # except ValueError or TypeError:
-    #     pass
-    #
-
+    try:
+        return {
+            'type': 'number',
+            'value': unicodedata.numeric(text.strip())
+        }
+    except (ValueError, TypeError):
+        pass
 
 
 def detect_operation(text):
-    if text.strip() == '+':
+    text = text.strip()
+    if text in operators:
         return {
-            'type': 'add'
+            'type': operators[text]
         }
-    elif text.strip() == '-':
-        return {
-            'type': 'subtract'
-        }
-    elif text.strip() == '*':
-        return {
-            'type': 'multiply'
-        }
-    elif text.strip() == '/':
-        return {
-            'type': 'divide'
-        }
-    return None
+
 
 def lexical_analysis_expression(unstripped_expression, line_num):
-    detected_data = detect_data(unstripped_expression)
-    if detected_data:
-        return [detected_data]
     expression = unstripped_expression.strip()
     for index in range(len(expression)):
         detected_data = detect_data(expression[:index + 1])
@@ -52,16 +46,24 @@ def lexical_analysis_expression(unstripped_expression, line_num):
             for index2 in range(index + 1, len(expression) + 1):
                 detected_operation = detect_operation(expression[index + 1:index2])
                 if detected_operation:
-                    other_analysed = lexical_analysis_expression(expression[index2:], line_num)
-                    if other_analysed:
-                        return [detected_data, detected_operation] + other_analysed
-    return None
+                    other_analysed, err = lexical_analysis_expression(expression[index2:], line_num)
+                    if other_analysed is not None and not err:
+                        return [detected_data, detected_operation] + other_analysed, False
+            else:
+                if index == len(expression) - 1:
+                    return [detected_data], False
+    return {
+        'type': 'error',
+        'error_type': 'syntax error',
+        'line_num': line_num,
+        'message': 'Invalid found'
+    }, True
 
 
 def lexical_analysis(code):
     lexical_analyzed = []
     for line_num, line in enumerate(code.split('\n')):
-        lexical_analyzed.append([])
+        # lexical_analyzed.append([])
         line = line.strip()
         if line == '':
             continue
@@ -77,12 +79,26 @@ def lexical_analysis(code):
                             continue
                         lexical_analyzed_expression = lexical_analysis_expression(segment[:-1], line_num)
                         if lexical_analyzed_expression:
-                            lexical_analyzed[-1].append({
+                            lexical_analyzed.append({
                                 'type': 'log',
                                 'value': lexical_analyzed_expression
                             })
                             index = index_end
                             break
-
+                    else:
+                        return {
+                            'type': 'error',
+                            'error_type': 'syntax error',
+                            'line_num': line_num,
+                            'text': 'invalid syntax'
+                        }, True
+                    break
+            else:
+                return {
+                    'type': 'error',
+                    'error_type': 'syntax error',
+                    'line_num': line_num,
+                    'text': 'invalid syntax'
+                }, True
 
     return lexical_analyzed, False

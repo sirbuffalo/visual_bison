@@ -1,0 +1,46 @@
+[
+    {
+        "name": "multiply",
+        "operator_type": "normal",
+        "operators": [
+            {
+                "operator": "*",
+                "keyword_operator": false
+            }
+        ],
+        "step": 0
+    },
+    {
+        "name": "divide",
+        "operator_type": "normal",
+        "operators": [
+            {
+                "operator": "/",
+                "keyword_operator": false
+            }
+        ],
+        "step": 0
+    },
+    {
+        "name": "add",
+        "operator_type": "normal",
+        "operators": [
+            {
+                "operator": "+",
+                "keyword_operator": false
+            }
+        ],
+        "step": 1
+    },
+    {
+        "name": "subtract",
+        "operator_type": "normal",
+        "operators": [
+            {
+                "operator": "-",
+                "keyword_operator": false
+            }
+        ],
+        "step": 1
+    }
+]
