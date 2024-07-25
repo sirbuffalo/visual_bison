@@ -38,6 +38,8 @@ def process_data(data, line_num):
         return data, False
     if data['type'] == 'number':
         return data, False
+    if data['type'] == 'var_get':
+        return data, False
     if data['type'] == 'function_call':
         new_data = {
             'type': 'function_call',
@@ -126,4 +128,14 @@ def semantic_analysis(lexical_analyzed):
                 return function_call, True
             function_call.update({'line_num': command['line_num']})
             semantic_analyzed.append(function_call)
+        if command['type'] == 'var_set':
+            semantic_analyzed_expression, err = semantic_analysis_expression(command['value'], command['line_num'])
+            if err:
+                return semantic_analyzed_expression, True
+            semantic_analyzed.append({
+                'type': 'var_set',
+                'name': command['name'],
+                'value': semantic_analyzed_expression,
+                'line_num': command['line_num']
+            })
     return semantic_analyzed, False

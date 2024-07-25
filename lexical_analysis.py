@@ -60,6 +60,11 @@ def detect_data(unstripped_text):
         }
     except (ValueError, TypeError):
         pass
+    if valid_varname(text):
+        return {
+            'type': 'var_get',
+            'name': text
+        }
     processed_function_call = process_function_call(text)
     if processed_function_call is not None:
         return processed_function_call
@@ -101,21 +106,41 @@ def lexical_analysis(code):
     for line_num, line in enumerate(code.split('\n')):
         line_num = line_num + 1
         line = line.strip()
+        
         # Blank Line
         if line == '':
             continue
 
-        # Function Call
-        processed_function_call = process_function_call(line)
-        if processed_function_call is not None:
-            processed_function_call.update({'line_num': line_num})
-            lexical_analyzed.append(processed_function_call)
-            continue
-        return {
-            'type': 'error',
-            'error_type': 'syntax error',
-            'line_num': line_num,
-            'message': 'Invalid syntax error'
-        }
+        # Variable Set
+        for i in range(1, len(line) - 1):
+            if valid_varname(line[:i]):
+                if line[i:].lstrip().startswith('='):
+                    print(line[i:].lstrip()[1:].lstrip())
+                    lexical_analyzed_expression, err = lexical_analysis_expression(line[i:].lstrip()[1:], line_num)
+                    print(lexical_analyzed_expression)
+                    print(err)
+                    if not err:
+                        lexical_analyzed.append({
+                            'type': 'var_set',
+                            'name': line[:i].strip(),
+                            'value': lexical_analyzed_expression,
+                            'line_num': line_num,
+                        })
+                        break
+        else:
+            # Function Call
+            processed_function_call = process_function_call(line)
+            if processed_function_call is not None:
+                processed_function_call.update({'line_num': line_num})
+                lexical_analyzed.append(processed_function_call)
+                continue
+
+            # Error if no types recognised
+            return {
+                'type': 'error',
+                'error_type': 'syntax error',
+                'line_num': line_num,
+                'message': 'Invalid syntax error'
+            }, True
 
     return lexical_analyzed, False
