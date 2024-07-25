@@ -46,6 +46,8 @@ def process_function_call(text):
 
 def detect_data(unstripped_text):
     text = unstripped_text.strip()
+
+    # Numbers
     try:
         return {
             'type': 'number',
@@ -53,6 +55,8 @@ def detect_data(unstripped_text):
         }
     except ValueError:
         pass
+
+    # Vulgar Fractions
     try:
         return {
             'type': 'number',
@@ -60,6 +64,8 @@ def detect_data(unstripped_text):
         }
     except (ValueError, TypeError):
         pass
+
+    # Variables
     if valid_varname(text):
         return {
             'type': 'var_get',
@@ -82,17 +88,25 @@ def detect_operation(text):
 def lexical_analysis_expression(unstripped_expression, line_num):
     expression = unstripped_expression.strip()
     for index in range(len(expression)):
+        # Detecting Data
         detected_data = detect_data(expression[:index + 1])
+        # Checking if Data Is Valid
         if detected_data is not None:
             for index2 in range(index + 1, len(expression) + 1):
+                # Detecting Operation
                 detected_operation = detect_operation(expression[index + 1:index2])
+                # Checking if Operation is Valid
                 if detected_operation:
+                    # Analysing Rest of Expression with recursion
                     other_analysed, err = lexical_analysis_expression(expression[index2:], line_num)
                     if other_analysed is not None and not err:
+                        # Checking if valid
                         return [detected_data, detected_operation] + other_analysed, False
             else:
+                # Just data no math
                 if index == len(expression) - 1:
                     return [detected_data], False
+    # No Expression Found
     return {
         'type': 'error',
         'error_type': 'syntax error',

@@ -77,16 +77,16 @@ def semantic_analysis_expression(lexical_analyzed_expression, line_num):
         if index < 0:
             return {
                 'type': 'error',
-                'error_type': 'syntax error',
+                'error_type': 'Unexpected error',
                 'line_num': line_num,
-                'text': 'invalid syntax'
+                'text': 'Unexpected error during pre-compiling'
             }, True
         if index >= len(semantic_analyzed_expression):
             return {
                 'type': 'error',
-                'error_type': 'syntax error',
+                'error_type': 'Unexpected error',
                 'line_num': line_num,
-                'text': 'invalid syntax'
+                'text': 'Unexpected error during pre-compiling'
             }, True
         if operators_dict[semantic_analyzed_expression[index]['type']]['operator_type'] == 'normal':
             if index < 1:
