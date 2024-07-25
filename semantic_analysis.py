@@ -33,15 +33,33 @@ operators_to_search = [
     for step in operators
 ]
 
-def process_data(data):
+def process_data(data, line_num):
     if data['type'] in ['add', 'subtract', 'multiply', 'divide']:
-        return data
+        return data, False
     if data['type'] == 'number':
-        return data
+        return data, False
+    if data['type'] == 'function_call':
+        new_data = {
+            'type': 'function_call',
+            'name': data['name'],
+            'args': [],
+        }
+        for arg in data['args']:
+            semantic_analyzed_expression, err = semantic_analysis_expression(arg, line_num)
+            if err:
+                return semantic_analyzed_expression, True
+            new_data['args'].append(semantic_analyzed_expression)
+            return new_data, False
+    return {
+        'type': 'error',
+        'error_type': 'unexpected error',
+        'line_num': line_num,
+        'text': 'unexpected error during addition'
+    }, True
 
 def semantic_analysis_expression(lexical_analyzed_expression, line_num):
     if len(lexical_analyzed_expression) == 1:
-        return process_data(lexical_analyzed_expression[0]), False
+        return process_data(lexical_analyzed_expression[0], line_num)
     semantic_analyzed_expression = lexical_analyzed_expression
 
     while True:
@@ -83,11 +101,17 @@ def semantic_analysis_expression(lexical_analyzed_expression, line_num):
                     'line_num': line_num,
                     'text': 'invalid syntax'
                 }, True
+            value1, err1 = process_data(semantic_analyzed_expression[index - 1], line_num)
+            value2, err2 = process_data(semantic_analyzed_expression[index + 1], line_num)
+            if err1:
+                return value1, True
+            if err2:
+                return value2, True
             semantic_analyzed_expression[index - 1:index + 2] = [
                 {
                     'type': semantic_analyzed_expression[index]['type'],
-                    'value1': process_data(semantic_analyzed_expression[index - 1]),
-                    'value2': process_data(semantic_analyzed_expression[index + 1])
+                    'value1': value1,
+                    'value2': value2
                 }
             ]
     return semantic_analyzed_expression[0], False
@@ -96,5 +120,10 @@ def semantic_analysis_expression(lexical_analyzed_expression, line_num):
 def semantic_analysis(lexical_analyzed):
     semantic_analyzed = []
     for command in lexical_analyzed:
-        if command['type'] == 'log':
-            pass
+        if command['type'] == 'function_call':
+            function_call, err = process_data(command, command['line_num'])
+            if err:
+                return function_call, True
+            function_call.update({'line_num': command['line_num']})
+            semantic_analyzed.append(function_call)
+    return semantic_analyzed, False

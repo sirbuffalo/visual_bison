@@ -1,6 +1,6 @@
-from re import search
 import unicodedata
 from json import load
+import re
 
 
 operators_unprocessed = load(open('operators.json', 'r'))
@@ -10,6 +10,38 @@ operators = {
     if operation['operator_type'] == 'normal'
     for operator in operation['operators']
 }
+
+
+def valid_varname(text):
+    return bool(re.search('^[A-Za-z_][A-Za-z0-9_]*$', text))
+
+def process_args(text):
+    for i in range(len(text), 0, -1):
+        analysis, err = lexical_analysis_expression(text[:i], 0)
+        if err:
+            continue
+        if len(text[i:].strip()) == 0:
+            return [analysis]
+        if text[i] != ',':
+            continue
+        rest_of_args = process_args(text[i + 1:])
+        if rest_of_args is not None:
+            return [analysis] + rest_of_args
+    return None
+
+def process_function_call(text):
+    if text.endswith(')'):
+        for i in range(1, len(text) - 2):
+            if valid_varname(text[:i].strip()):
+                if text[i:].lstrip().startswith('('):
+                    processed_args = process_args(text[i + 1:-1])
+                    if processed_args is not None:
+                        return {
+                            'type': 'function_call',
+                            'name': text[:i].strip(),
+                            'args': processed_args,
+                        }
+    return None
 
 
 def detect_data(unstripped_text):
@@ -28,6 +60,10 @@ def detect_data(unstripped_text):
         }
     except (ValueError, TypeError):
         pass
+    processed_function_call = process_function_call(text)
+    if processed_function_call is not None:
+        return processed_function_call
+    return None
 
 
 def detect_operation(text):
@@ -42,7 +78,7 @@ def lexical_analysis_expression(unstripped_expression, line_num):
     expression = unstripped_expression.strip()
     for index in range(len(expression)):
         detected_data = detect_data(expression[:index + 1])
-        if detected_data:
+        if detected_data is not None:
             for index2 in range(index + 1, len(expression) + 1):
                 detected_operation = detect_operation(expression[index + 1:index2])
                 if detected_operation:
@@ -63,42 +99,23 @@ def lexical_analysis_expression(unstripped_expression, line_num):
 def lexical_analysis(code):
     lexical_analyzed = []
     for line_num, line in enumerate(code.split('\n')):
-        # lexical_analyzed.append([])
+        line_num = line_num + 1
         line = line.strip()
+        # Blank Line
         if line == '':
             continue
-        index = 0
-        while index < len(line):
-            for index_end in range(len(line), index, -1):
-                segment = line[index:index_end]
-                if search(r'^ *log *\($', segment):
-                    index_new = index_end
-                    for index_end in range(len(line), index_new, -1):
-                        segment = line[index_new:index_end]
-                        if segment[-1] != ')':
-                            continue
-                        lexical_analyzed_expression = lexical_analysis_expression(segment[:-1], line_num)
-                        if lexical_analyzed_expression:
-                            lexical_analyzed.append({
-                                'type': 'log',
-                                'value': lexical_analyzed_expression
-                            })
-                            index = index_end
-                            break
-                    else:
-                        return {
-                            'type': 'error',
-                            'error_type': 'syntax error',
-                            'line_num': line_num,
-                            'text': 'invalid syntax'
-                        }, True
-                    break
-            else:
-                return {
-                    'type': 'error',
-                    'error_type': 'syntax error',
-                    'line_num': line_num,
-                    'text': 'invalid syntax'
-                }, True
+
+        # Function Call
+        processed_function_call = process_function_call(line)
+        if processed_function_call is not None:
+            processed_function_call.update({'line_num': line_num})
+            lexical_analyzed.append(processed_function_call)
+            continue
+        return {
+            'type': 'error',
+            'error_type': 'syntax error',
+            'line_num': line_num,
+            'message': 'Invalid syntax error'
+        }
 
     return lexical_analyzed, False
