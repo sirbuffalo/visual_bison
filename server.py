@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from os.path import abspath
-from json import dumps
 
 
 app = Flask(__name__, template_folder=abspath('./client'))
@@ -28,7 +27,7 @@ def run():
             'line_num': 2
         }
     ]
-    return render_template('index.html', code=dumps(code))
+    return render_template('index.html', code=code)
 
 
 @app.route('/run.js')
