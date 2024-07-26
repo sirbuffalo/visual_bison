@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from os.path import abspath
+from json import dumps
 
 
 app = Flask(__name__, template_folder=abspath('./client'))
@@ -27,7 +28,7 @@ def run():
             'line_num': 2
         }
     ]
-    return render_template('index.html', code=code)
+    return render_template('index.html', code=dumps(code))
 
 
 @app.route('/run.js')
@@ -40,4 +41,4 @@ def run_css():
 
 
 if __name__ == '__main__':
-    app.run(debug=False, port=3000)
+    app.run(debug=False)
