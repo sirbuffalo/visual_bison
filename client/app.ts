@@ -6,9 +6,15 @@ interface Number extends BaseExpression {
     value: number;
 }
 
-type Expression = Number;
+interface VarGet extends BaseExpression {
+    type: "var_get";
+    name: string;
+}
+
+type Expression = Number | VarGet;
 
 interface BaseStatement {
+    type: string;
     line_num: number;
 }
 
@@ -21,6 +27,7 @@ interface VarSet extends BaseStatement {
 interface FunctionCall extends BaseStatement {
     type: "function_call";
     name: string;
+    args: Expression[];
 }
 
 type Statement = VarSet | FunctionCall;
@@ -28,7 +35,7 @@ type Statement = VarSet | FunctionCall;
 interface State {
     log: HTMLElement;
     vars: Map<string, number>;
-    funcs: Map<string, () => any[]>;
+    funcs: Map<string, (state: State, args: any[]) => void>;
 }
 
 export async function main(cont: HTMLElement) {
@@ -76,7 +83,9 @@ export async function main(cont: HTMLElement) {
     const state: State = {
         log: log,
         vars: new Map(),
-        funcs: new Map(),
+        funcs: new Map([
+            ["log", funcLog],
+        ]),
     };
 
     for (const stmt of ast) {
@@ -87,23 +96,33 @@ export async function main(cont: HTMLElement) {
 async function execStmt(state: State, stmt: Statement) {
     switch (stmt.type) {
         case "var_set":
-            state.vars.set(stmt.name, await execExpr(stmt.value));
+            state.vars.set(stmt.name, await execExpr(state, stmt.value));
             break;
 
         case "function_call":
-//            state.funcs.get(stmt.name)()
+            const args = [];
+            for (const arg of stmt.args) {
+                args.push(await execExpr(state, arg));
+            }
+            state.funcs.get(stmt.name)!(state, args);
             break;
-
-        default:
-            console.log("unknown statement:", stmt);
     }
 }
 
-async function execExpr(expr: Expression) {
+async function execExpr(state: State, expr: Expression): Promise<number> {
     switch (expr.type) {
         case "number":
             return expr.value;
+
+        case "var_get":
+            return state.vars.get(expr.name)!;
     }
+
+    throw new Error("unknown expression type");
+}
+
+async function funcLog(state: State, args: any[]) {
+    state.log.appendChild(document.createTextNode(args[0] + "\n"));
 }
 
 /*

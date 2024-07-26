@@ -38,7 +38,9 @@ export async function main(cont) {
     const state = {
         log: log,
         vars: new Map(),
-        funcs: new Map(),
+        funcs: new Map([
+            ["log", funcLog],
+        ]),
     };
     for (const stmt of ast) {
         await execStmt(state, stmt);
@@ -47,20 +49,28 @@ export async function main(cont) {
 async function execStmt(state, stmt) {
     switch (stmt.type) {
         case "var_set":
-            state.vars.set(stmt.name, await execExpr(stmt.value));
+            state.vars.set(stmt.name, await execExpr(state, stmt.value));
             break;
         case "function_call":
-            //            state.funcs.get(stmt.name)()
+            const args = [];
+            for (const arg of stmt.args) {
+                args.push(await execExpr(state, arg));
+            }
+            state.funcs.get(stmt.name)(state, args);
             break;
-        default:
-            console.log("unknown statement:", stmt);
     }
 }
-async function execExpr(expr) {
+async function execExpr(state, expr) {
     switch (expr.type) {
         case "number":
             return expr.value;
+        case "var_get":
+            return state.vars.get(expr.name);
     }
+    throw new Error("unknown expression type");
+}
+async function funcLog(state, args) {
+    state.log.appendChild(document.createTextNode(args[0] + "\n"));
 }
 /*
 varibles = {}
