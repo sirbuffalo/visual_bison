@@ -34,7 +34,21 @@ export async function main(cont) {
     log.style.borderStyle = "solid";
     log.style.borderWidth = "1px";
     log.style.borderColor = "var(--color3)";
-    const ast = await (await fetch("parsed.json")).json();
+    // Assuming the AST is JSON stored in data-code attribute.
+    const astElement = document.getElementById('code-parsed');
+    if (!astElement) {
+        throw new Error('AST element not found');
+    }
+    const codeData = astElement.dataset.code;
+    console.log("Data-code attribute value:", codeData); // Log the data-code attribute value
+    let ast;
+    try {
+        ast = JSON.parse(codeData || '[]');
+    }
+    catch (error) {
+        console.error("Error parsing JSON:", error);
+        throw new Error('Invalid JSON in data-code attribute');
+    }
     const state = {
         log: log,
         vars: new Map(),
@@ -66,53 +80,17 @@ async function execExpr(state, expr) {
             return expr.value;
         case "var_get":
             return state.vars.get(expr.name);
+        case "add":
+            return (await execExpr(state, expr.value1)) + (await execExpr(state, expr.value2));
+        case "subtract":
+            return (await execExpr(state, expr.value1)) - (await execExpr(state, expr.value2));
+        case "multiply":
+            return (await execExpr(state, expr.value1)) * (await execExpr(state, expr.value2));
+        case "divide":
+            return (await execExpr(state, expr.value1)) / (await execExpr(state, expr.value2));
     }
     throw new Error("unknown expression type");
 }
 async function funcLog(state, args) {
     state.log.appendChild(document.createTextNode(args[0] + "\n"));
 }
-/*
-varibles = {}
-function interpretExpression(expression) {
-    if (expression.type === 'number') {
-        return expression
-    }
-    if (expression.type === 'var_get') {
-        return
-    }
-    if (expression.type === 'add') {
-        return {
-            type: 'number',
-            value: interpretExpression(expression.value1).value + interpretExpression(expression.value2).value
-        }
-    }
-    if (expression.type === 'subtract') {
-        return {
-            type: 'number',
-            value: interpretExpression(expression.value1).value + interpretExpression(expression.value2).value
-        }
-    }
-    if (expression.type === 'multiply') {
-        return {
-            type: 'number',
-            value: interpretExpression(expression.value1).value + interpretExpression(expression.value2).value
-        }
-    }
-    if (expression.type === 'divide') {
-        return {
-            type: 'number',
-            value: interpretExpression(expression.value1).value + interpretExpression(expression.value2).value
-        }
-    }
-}
-
-function interpret(semanticAnalyzed) {
-    for (const semanticAnalyzedPart of semanticAnalyzed) {
-        if (semanticAnalyzedPart.type === 'var_set') {
-
-        }
-    }
-}
-
- */ 

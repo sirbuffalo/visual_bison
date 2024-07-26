@@ -118,7 +118,6 @@ def lexical_analysis_expression(unstripped_expression, line_num):
 def lexical_analysis(code):
     lexical_analyzed = []
     for line_num, line in enumerate(code.split('\n')):
-        line_num = line_num + 1
         line = line.strip()
         
         # Blank Line
@@ -142,6 +141,7 @@ def lexical_analysis(code):
                         })
                         break
         else:
+
             # Function Call
             processed_function_call = process_function_call(line)
             if processed_function_call is not None:

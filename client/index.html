@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="app.css" rel="stylesheet" type="text/css" />
+    <meta id="code-parsed" data-code="{{ code }}">
+    <link href="/run.css" rel="stylesheet" type="text/css" />
     <title>Visual Bison</title>
 </head>
 <body>
 <script type="module">
-    import { main } from './app.js';
+    import { main } from '/run.js';
 
     document.addEventListener("DOMContentLoaded", async () => {
         await main(document.getElementsByTagName("body")[0]);

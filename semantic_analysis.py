@@ -34,7 +34,7 @@ operators_to_search = [
 ]
 
 def process_data(data, line_num):
-    if data['type'] in ['add', 'subtract', 'multiply', 'divide']:
+    if data['type'] in operators_dict.keys():
         return data, False
     if data['type'] == 'number':
         return data, False
@@ -56,7 +56,7 @@ def process_data(data, line_num):
         'type': 'error',
         'error_type': 'unexpected error',
         'line_num': line_num,
-        'text': 'unexpected error during addition'
+        'text': 'unexpected error'
     }, True
 
 def semantic_analysis_expression(lexical_analyzed_expression, line_num):
