@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="app.css" rel="stylesheet" type="text/css" />
+    <title>Visual Bison</title>
+</head>
+<body>
+<script type="module">
+    import { main } from './app.js';
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        await main(document.getElementsByTagName("body")[0]);
+    });
+</script>
+</body>
+</html>

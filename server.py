@@ -6,9 +6,9 @@ app = Flask(__name__)
 def run():
     return render_template('run.html', projectTitle='test')
 
-@app.route('/run.js')
+@app.route('/app.ts')
 def run_js():
-    return send_file(path.abspath('scripts/run.js'), download_name='run.js')
+    return send_file(path.abspath('scripts/app.ts'), download_name='app.ts')
 
 @app.route('/run.css')
 def run_css():
