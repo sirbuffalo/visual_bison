@@ -6,30 +6,33 @@ from json import dumps
 app = Flask(__name__, template_folder=abspath('./client'))
 @app.route('/run')
 def run():
-    code = [
-        {
-            'type': 'var_set',
-            'name': 'x',
-            'value': {
-                'type': 'number',
-                'value': 3.0
-            },
-            'line_num': 1
-        },
-        {
-            'type': 'function_call',
-            'name': 'log',
-            'args': [
-                {
-                    'type': 'var_get',
-                    'name': 'x'
-                }
-            ],
-            'line_num': 2
-        }
-    ]
-    return render_template('index.html', code=dumps(code))
+    return render_template('index.html')
 
+
+@app.route('/parsed.json')
+def parsed():
+    return [
+  {
+    "type": "var_set",
+    "name": "x",
+    "value": {
+      "type": "number",
+      "value": 3.0
+    },
+    "line_num": 2
+  },
+  {
+    "type": "function_call",
+    "name": "log",
+    "args": [
+      {
+        "type": "var_get",
+        "name": "x"
+      }
+    ],
+    "line_num": 3
+  }
+]
 
 @app.route('/run.js')
 def run_js():
