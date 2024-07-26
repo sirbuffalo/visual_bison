@@ -25,7 +25,7 @@ def run():
                     'name': 'x'
                 }
             ],
-            'line_num': 3
+            'line_num': 2
         }
     ]
     return render_template('index.html', code=dumps(code))
