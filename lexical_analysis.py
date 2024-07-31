@@ -118,8 +118,31 @@ def lexical_analysis_expression(unstripped_expression, line_num):
 def lexical_analysis(code):
     lexical_analyzed = []
     for line_num, line in enumerate(code.split('\n')):
-        line = line.strip()
-        
+        line = line.lstrip()
+
+        # Comments
+        in_double_string = False
+        in_single_string = False
+        escaped = False
+        line_without_comments = ''
+        for char in line:
+            if escaped:
+                escaped = False
+                line_without_comments += char
+            elif char == '"' and not in_single_string:
+                in_double_string = not in_double_string
+                line_without_comments += char
+            elif char == '\'' and not in_double_string:
+                in_single_string = not in_single_string
+                line_without_comments += char
+            elif char == '\\' and (in_single_string or in_double_string):
+                escaped = True
+                line_without_comments += char
+            elif char == '#' and not in_single_string and not in_double_string:
+                break
+            line_without_comments += char
+        line = line_without_comments.rstrip()
+
         # Blank Line
         if line == '':
             continue

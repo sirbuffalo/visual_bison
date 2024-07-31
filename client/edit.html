@@ -2,11 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit {{ project_title }} - Visual Bison</title>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/material-darker.min.css"/>
+    <title>Edit - Visual Bison</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" rel="stylesheet"
+          type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/material-darker.min.css" rel="stylesheet"
+          type="text/css"/>
+    <link href="/edit.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
+<div class="popup-container" id="popup-container">
+    <div class="popup" id="popup">
+        <div class="exit" id="exit"></div>
+        <form target="/addevent" method="post">
+            <input type="hidden" id="event-title" name="event-title" required/>
+            <div class="choose-event" id="choose-event"></div>
+        </form>
+    </div>
+    <div class="darken" id="darken"></div>
+</div>
+<div class="top-bar-container" id="top-bar-container">
+    <div class="top-bar" id="top-bar">
+        <a class="top-bar-item run-button" href="javascript:run()">
+            <span class="run-icon"></span>
+        </a>
+        <a class="top-bar-item">
+            Sprites
+        </a>
+        <a class="top-bar-item">
+            Project Settings
+        </a>
+        <a class="top-bar-item">
+            My Projects
+        </a>
+    </div>
+</div>
+<div class="events-container" id="events-container">
+    <div class="events" id="events">
+        <div class="event add" id="add-event">Add Event</div>
+    </div>
+</div>
+<textarea id="code" name="code"></textarea>
 <script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/closebrackets.min.js"></script>
+<script src="/edit.js"></script>
 </body>
 </html>

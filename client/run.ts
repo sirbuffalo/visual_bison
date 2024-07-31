@@ -87,7 +87,6 @@ export async function main(cont: HTMLElement) {
             ["log", funcLog],
         ]),
     };
-
     for (const stmt of ast) {
         await execStmt(state, stmt);
     }

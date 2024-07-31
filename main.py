@@ -2,6 +2,7 @@ import lexical_analysis
 import semantic_analysis
 from json import dumps
 
+x
 lexical_analyzed, err = lexical_analysis.lexical_analysis('''
 x = 3
 log(x)
