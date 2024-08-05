@@ -3,47 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit - Visual Bison</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" rel="stylesheet"
-          type="text/css"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/material-darker.min.css" rel="stylesheet"
-          type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/material-darker.min.css" rel="stylesheet" type="text/css"/>
     <link href="/edit.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<div class="popup-container" id="popup-container">
-    <div class="popup" id="popup">
-        <div class="exit" id="exit"></div>
-        <form target="/addevent" method="post">
-            <input type="hidden" id="event-title" name="event-title" required/>
-            <div class="choose-event" id="choose-event"></div>
-        </form>
+    <div class="popup-container" id="popup-container">
+        <div class="popup" id="popup">
+            <div class="exit-popup" id="exit-popup" role="button"></div>
+            <form target="/addevent" method="post">
+                <input type="hidden" id="event-title" name="event-title" required/>
+                <div class="choose-event" id="choose-event"></div>
+            </form>
+        </div>
+        <div class="darken" id="darken"></div>
     </div>
-    <div class="darken" id="darken"></div>
-</div>
-<div class="top-bar-container" id="top-bar-container">
-    <div class="top-bar" id="top-bar">
-        <a class="top-bar-item run-button" href="javascript:run()">
-            <span class="run-icon"></span>
-        </a>
-        <a class="top-bar-item">
-            Sprites
-        </a>
-        <a class="top-bar-item">
-            Project Settings
-        </a>
-        <a class="top-bar-item">
-            My Projects
-        </a>
+    <div class="console-container" id="console-container">
+        <div class="console-drag-bar" id="console-drag-bar">
+        </div>
+        <div class="exit-console" id="exit-console" role="button"></div>
+        <div class="console" id="console">
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+            <span>Test</span><br>
+        </div>
     </div>
-</div>
-<div class="events-container" id="events-container">
-    <div class="events" id="events">
-        <div class="event add" id="add-event">Add Event</div>
+    <div class="top-bar-container" id="top-bar-container">
+        <div class="top-bar" id="top-bar">
+            <a class="top-bar-item run-button" href="javascript:run()">
+                <div class="run-icon"></div>
+            </a>
+            <a class="top-bar-item" href="#">Sprites</a>
+            <a class="top-bar-item" href="#">Project Settings</a>
+            <a class="top-bar-item" href="#">My Projects</a>
+        </div>
     </div>
-</div>
-<textarea id="code" name="code"></textarea>
-<script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/closebrackets.min.js"></script>
-<script src="/edit.js"></script>
+    <div class="events-container" id="events-container">
+        <div class="events" id="events">
+            <div class="event add" id="add-event" role="button">Add Event</div>
+        </div>
+    </div>
+    <textarea id="code" name="code"></textarea>
+    <div class="run-divider" id="run-divider"></div>
+    <div class="right-side" id="right-side">
+        <div class="run-control">
+            <div class="open-console" id="open-console">
+                <div class="open-console-icon"></div>
+            </div>
+        </div>
+        <div class="run-container" id="run-container">
+            <div class="run-div"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/closebrackets.min.js"></script>
+    <script src="/edit.js"></script>
 </body>
 </html>

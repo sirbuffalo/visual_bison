@@ -59,7 +59,7 @@ def edit():
 def edit_data():
     return app.response_class(
         response=json.dumps({
-            'code': 'x = 3\nlog(x)\n',
+            'code': '''x = 3\nlog(x)\n''',
             'events': [
                 ('Start', True, True),
                 ('Click', False, False)
@@ -94,6 +94,14 @@ def run_svg():
 @app.route('/run-hover.svg')
 def run_hover_svg():
     return send_file(abspath('client/run-hover.svg'), download_name='run-hover.svg')
+
+@app.route('/console.svg')
+def console_svg():
+    return send_file(abspath('client/console.svg'), download_name='console.svg')
+
+@app.route('/console-hover.svg')
+def console_hover_svg():
+    return send_file(abspath('client/console-hover.svg'), download_name='console-hover.svg')
 
 
 if __name__ == '__main__':
