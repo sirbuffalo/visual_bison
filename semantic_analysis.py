@@ -54,9 +54,9 @@ def process_data(data, line_num):
             return new_data, False
     return {
         'type': 'error',
-        'error_type': 'unexpected error',
+        'error_type': 'unknown_error',
         'line_num': line_num,
-        'text': 'unexpected error'
+        'text': 'A Unknown error has occurred'
     }, True
 
 def semantic_analysis_expression(lexical_analyzed_expression, line_num):
@@ -77,29 +77,29 @@ def semantic_analysis_expression(lexical_analyzed_expression, line_num):
         if index < 0:
             return {
                 'type': 'error',
-                'error_type': 'Unexpected error',
+                'error_type': 'unknown_error',
                 'line_num': line_num,
-                'text': 'Unexpected error during pre-compiling'
+                'text': 'A Unknown error has occurred'
             }, True
         if index >= len(semantic_analyzed_expression):
             return {
                 'type': 'error',
-                'error_type': 'Unexpected error',
+                'error_type': 'unknown_error',
                 'line_num': line_num,
-                'text': 'Unexpected error during pre-compiling'
+                'text': 'A Unknown error has occurred'
             }, True
         if operators_dict[semantic_analyzed_expression[index]['type']]['operator_type'] == 'normal':
             if index < 1:
                 return {
                     'type': 'error',
-                    'error_type': 'syntax error',
+                    'error_type': 'syntax_error',
                     'line_num': line_num,
                     'text': 'invalid syntax'
                 }, True
             if index > len(semantic_analyzed_expression) - 2:
                 return {
                     'type': 'error',
-                    'error_type': 'syntax error',
+                    'error_type': 'syntax_error',
                     'line_num': line_num,
                     'text': 'invalid syntax'
                 }, True

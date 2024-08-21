@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify, json
 from os.path import abspath
-from json import dumps
+from lexical_analysis import lexical_analysis
+from semantic_analysis import semantic_analysis
 
 app = Flask(__name__, template_folder=abspath('./client'))
 
@@ -52,7 +53,32 @@ def run_css():
 
 @app.route('/edit')
 def edit():
-    return render_template('edit.html')
+    return render_template('edit/edit.html')
+
+@app.post('/parse')
+def parse():
+    data = request.get_json()
+    code = data.get('code')
+    lexical_analyzed, error_lexical_analysis = lexical_analysis(code)
+    if error_lexical_analysis:
+        return app.response_class(
+            response=json.dumps({
+                'parsed': lexical_analyzed,
+                'error': True
+            }),
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        semantic_analyzed, error_semantic_analysis = semantic_analysis(lexical_analyzed)
+        return app.response_class(
+            response=json.dumps({
+                'parsed': semantic_analyzed,
+                'error': error_semantic_analysis
+            }),
+            status=200,
+            mimetype='application/json'
+        )
 
 
 @app.post('/edit.json')
@@ -73,35 +99,35 @@ def edit_data():
 
 @app.route('/edit.js')
 def edit_js():
-    return send_file(abspath('client/edit.js'), download_name='edit.js')
+    return send_file(abspath('client/edit/edit.js'), download_name='edit.js')
 
 
 @app.route('/edit.css')
 def edit_css():
-    return send_file(abspath('client/edit.css'), download_name='edit.css')
+    return send_file(abspath('client/edit/edit.css'), download_name='edit.css')
 
 
 @app.route('/exit.svg')
 def exit_svg():
-    return send_file(abspath('client/exit.svg'), download_name='exit.svg')
+    return send_file(abspath('client/icons/exit.svg'), download_name='exit.svg')
 
 
 @app.route('/run.svg')
 def run_svg():
-    return send_file(abspath('client/run.svg'), download_name='run.svg')
+    return send_file(abspath('client/icons/run.svg'), download_name='run.svg')
 
 
 @app.route('/run-hover.svg')
 def run_hover_svg():
-    return send_file(abspath('client/run-hover.svg'), download_name='run-hover.svg')
+    return send_file(abspath('client/icons/run-hover.svg'), download_name='run-hover.svg')
 
 @app.route('/console.svg')
 def console_svg():
-    return send_file(abspath('client/console.svg'), download_name='console.svg')
+    return send_file(abspath('client/icons/console.svg'), download_name='console.svg')
 
 @app.route('/console-hover.svg')
 def console_hover_svg():
-    return send_file(abspath('client/console-hover.svg'), download_name='console-hover.svg')
+    return send_file(abspath('client/icons/console-hover.svg'), download_name='console-hover.svg')
 
 
 if __name__ == '__main__':

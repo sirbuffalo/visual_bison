@@ -109,15 +109,15 @@ def lexical_analysis_expression(unstripped_expression, line_num):
     # No Expression Found
     return {
         'type': 'error',
-        'error_type': 'syntax error',
+        'error_type': 'syntax_error',
         'line_num': line_num,
-        'message': 'Invalid found'
+        'message': 'invalid syntax'
     }, True
 
 
 def lexical_analysis(code):
     lexical_analyzed = []
-    for line_num, line in enumerate(code.split('\n')):
+    for line_num, line in enumerate(code.split('\n'), 1):
         line = line.lstrip()
 
         # Comments
@@ -175,9 +175,9 @@ def lexical_analysis(code):
             # Error if no types recognised
             return {
                 'type': 'error',
-                'error_type': 'syntax error',
+                'error_type': 'syntax_error',
                 'line_num': line_num,
-                'message': 'Invalid syntax error'
+                'message': 'invalid syntax'
             }, True
 
     return lexical_analyzed, False

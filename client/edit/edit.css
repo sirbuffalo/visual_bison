@@ -5,7 +5,10 @@
     --robin-egg-blue: #4ecdc4;
     --robin-egg-blue-darker: #2D9F98;
     --robin-egg-blue-lighter: #90E0DA;
+    --flame: #E4572E;
+    --flame-lighter: #EA7E5D;
     --darken-opacity: 0.6;
+    --line-error: 2;
 }
 
 body, html {
@@ -162,13 +165,47 @@ body, html {
     top: 0;
     left: 0;
     right: 0;
-    height: 20vw;
-    padding: 1.5vw;
+    height: 25vw;
+    padding: 0;
     overflow-y: scroll;
     overflow-wrap: break-word;
+    border-radius: 0 0 2vw 2vw;
+    width: 100%;
+}
+
+.error-console {
+    display: flex;
+    align-items: center;
+    padding: 0.5vh 1vh;
+    margin-bottom: 0.5vh;
+    background-color: var(--flame);
+    color: var(--onyx);
+    font-family: monospace;
+}
+
+.log-console {
+    padding: 0 2.5vw;
     font-size: 2vh;
     line-height: 2.5vh;
+    color: var(--onyx)
 }
+
+.line-num-console {
+    margin-right: 1vh;
+    padding: 0.2vh 0.5vh;
+    background-color: var(--flame-lighter);
+    border-radius: 0.3vh;
+    color: var(--onyx);
+    font-weight: bold;
+}
+
+.message-console {
+    flex-grow: 1;
+    padding-left: 1vh;
+    color: var(--onyx);
+    background-color: transparent;
+}
+
 
 .events-container {
     width: 100vw;
@@ -362,6 +399,13 @@ body, html {
 
 .CodeMirror-linenumber {
     color: white !important;
+}
+
+.error {
+    text-decoration-color: red;
+    text-decoration-style: wavy;
+    text-decoration-line: underline;
+    text-decoration-skip-ink: none;
 }
 
 .CodeMirror-selected {
