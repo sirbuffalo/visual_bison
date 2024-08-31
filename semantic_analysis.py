@@ -38,6 +38,20 @@ def process_data(data, line_num):
         return data, False
     if data['type'] == 'number':
         return data, False
+    if data['type'] == 'range':
+        start, err = semantic_analysis_expression(data['start'], line_num)
+        if err:
+            return start, True
+        else:
+            end, err = semantic_analysis_expression(data['end'], line_num)
+            if err:
+                return end, True
+            else:
+                return {
+                    'type': 'range',
+                    'start':  start,
+                    'end': end
+                }, False
     if data['type'] == 'var_get':
         return data, False
     if data['type'] == 'function_call':
@@ -65,7 +79,6 @@ def semantic_analysis_expression(lexical_analyzed_expression, line_num):
     semantic_analyzed_expression = lexical_analyzed_expression
 
     while True:
-        index = None
         for items in operators_to_search:
             indexes = [semantic_analyzed_expression.index(item) for item in items if item in semantic_analyzed_expression]
             if len(indexes) > 0:
@@ -138,4 +151,19 @@ def semantic_analysis(lexical_analyzed):
                 'value': semantic_analyzed_expression,
                 'line_num': command['line_num']
             })
+        if command['type'] == 'for':
+            list_to_loop_through, err = semantic_analysis_expression(command['list'], command['line_num'])
+            if err:
+                return list_to_loop_through, True
+            else:
+                code, err = semantic_analysis(command['code'])
+                if err:
+                    pass
+                else:
+                    semantic_analyzed.append({
+                        'type': 'for',
+                        'var_name': command['var_name'],
+                        'list': list_to_loop_through,
+                        'code': code
+                    })
     return semantic_analyzed, False

@@ -183,7 +183,7 @@ body, html {
     font-family: monospace;
 }
 
-.log-console {
+.print-console {
     padding: 0 2.5vw;
     font-size: 2vh;
     line-height: 2.5vh;

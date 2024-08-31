@@ -34,7 +34,7 @@ interface PageData {
 }
 
 CodeMirror.defineMode('visual_bison', function (config: any, parserConfig: any) {
-    const keywords = new Set(['log']);
+    const keywords = new Set(['print']);
     const operators = new Set(['+', '-', '*', '/', '=']);
 
     return {
@@ -124,9 +124,9 @@ async function run(): Promise<void> {
 
     consoleDiv.innerHTML = ''
     if (responseJSON.error) {
-        logToConsole(responseJSON.parsed)
+        printToConsole(responseJSON.parsed)
     } else {
-        await runCode(responseJSON.parsed, logToConsole)
+        await runCode(responseJSON.parsed, printToConsole)
     }
 }
 
@@ -138,7 +138,7 @@ function closeConsole(): void {
     consoleContainer.style.display = 'none';
 }
 
-function logToConsole(toLog: Log) {
+function printToConsole(toLog: Log) {
     switch (toLog.type) {
         case ('error'):
             const errorDiv = document.createElement('div')
@@ -155,12 +155,12 @@ function logToConsole(toLog: Log) {
             errorDiv.appendChild(messageDiv)
             consoleDiv.appendChild(errorDiv)
             break;
-        case ('log'):
-            const logDiv = document.createElement('div')
-            const logTextNode = document.createTextNode(toLog.message)
-            logDiv.classList.add('log-console')
-            logDiv.appendChild(logTextNode)
-            consoleDiv.appendChild(logDiv)
+        case ('print'):
+            const printDiv = document.createElement('div')
+            const printTextNode = document.createTextNode(toLog.message)
+            printDiv.classList.add('print-console')
+            printDiv.appendChild(printTextNode)
+            consoleDiv.appendChild(printDiv)
             break;
     }
 }
@@ -304,7 +304,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             .then(parseJSON => {
                 if (parseJSON.error) {
                     const error = parseJSON.parsed
-                    console.log(error)
                     errorLine = document.querySelector(`.CodeMirror-code > div:nth-child(${error.line_num}) > .CodeMirror-line`) as HTMLDivElement
                     errorLine.classList.add('error')
                 }

@@ -2,7 +2,7 @@ import unicodedata
 from json import load
 import re
 
-
+indent = '    '
 operators_unprocessed = load(open('operators.json', 'r'))
 operators = {
     operator['operator']: operation['name']
@@ -65,15 +65,34 @@ def detect_data(unstripped_text):
     except (ValueError, TypeError):
         pass
 
+    for start_end_index in range(1, len(text) - 1):
+        if text[start_end_index:start_end_index + 3] == '...':
+            start_str = text[:start_end_index]
+            start, err = lexical_analysis_expression(start_str, 0)
+            if not err:
+                end_str = text[start_end_index + 3:]
+                end, err = lexical_analysis_expression(end_str, 0)
+                if not err:
+                    return {
+                        'type': 'range',
+                        'start': start,
+                        'end': end
+                    }
+
     # Variables
     if valid_varname(text):
         return {
             'type': 'var_get',
             'name': text
         }
+
+    # Functions
     processed_function_call = process_function_call(text)
     if processed_function_call is not None:
         return processed_function_call
+
+    # Parentheses
+
     return None
 
 
@@ -117,8 +136,29 @@ def lexical_analysis_expression(unstripped_expression, line_num):
 
 def lexical_analysis(code):
     lexical_analyzed = []
+    add_tos = [lexical_analyzed]
     for line_num, line in enumerate(code.split('\n'), 1):
-        line = line.lstrip()
+
+        line_without_indent = line
+        indents = 0
+        for i in range(4, len(line), len(indent)):
+            if line[i - 4:i] == indent:
+                line_without_indent = line[i:]
+                indents += 1
+            else:
+                break
+
+        line = line_without_indent.strip()
+        if line == '':
+            continue
+        del add_tos[indents + 1:]
+        if indents >= len(add_tos):
+            return {
+                'type': 'error',
+                'error_type': 'indent_error',
+                'line_num': line_num,
+                'message': 'too many indents'
+            }, True
 
         # Comments
         in_double_string = False
@@ -151,12 +191,9 @@ def lexical_analysis(code):
         for i in range(1, len(line) - 1):
             if valid_varname(line[:i]):
                 if line[i:].lstrip().startswith('='):
-                    print(line[i:].lstrip()[1:].lstrip())
                     lexical_analyzed_expression, err = lexical_analysis_expression(line[i:].lstrip()[1:], line_num)
-                    print(lexical_analyzed_expression)
-                    print(err)
                     if not err:
-                        lexical_analyzed.append({
+                        add_tos[indents].append({
                             'type': 'var_set',
                             'name': line[:i].strip(),
                             'value': lexical_analyzed_expression,
@@ -165,11 +202,38 @@ def lexical_analysis(code):
                         break
         else:
 
+            # For Loop
+            if line.startswith('for ') and line.endswith(':'):
+                non_for = line[4:].lstrip()
+                con = True
+                for i in range(1, len(non_for) - 4):
+                    if valid_varname(non_for[:i]):
+                        var_name = non_for[:i]
+                        non_for_var = non_for[i:].lstrip()
+                        if non_for_var.startswith('in '):
+                            expr = non_for_var[3:-1]
+                            list_to_loop_through, err = lexical_analysis_expression(expr, line_num)
+                            if not err:
+                                code_to_run = []
+                                add_tos[indents].append({
+                                    'type': 'for',
+                                    'line_num': line_num,
+                                    'var_name': var_name,
+                                    'list': list_to_loop_through,
+                                    'code': code_to_run,
+                                })
+                                add_tos.append(code_to_run)
+                                break
+                else:
+                    con = False
+                if con:
+                    continue
+
             # Function Call
             processed_function_call = process_function_call(line)
             if processed_function_call is not None:
                 processed_function_call.update({'line_num': line_num})
-                lexical_analyzed.append(processed_function_call)
+                add_tos[indents].append(processed_function_call)
                 continue
 
             # Error if no types recognised

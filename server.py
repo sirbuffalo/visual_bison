@@ -85,12 +85,12 @@ def parse():
 def edit_data():
     return app.response_class(
         response=json.dumps({
-            'code': '''x = 3\nlog(x)\n''',
+            'code': '''x = 3\nprint(x)\n''',
             'events': [
                 ('Start', True, True),
                 ('Click', False, False)
             ],
-            'projectTitle': 'Log 3'
+            'projectTitle': 'Print 3'
         }),
         status=200,
         mimetype='application/json'
